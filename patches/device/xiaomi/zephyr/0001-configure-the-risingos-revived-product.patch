@@ -16,10 +16,10 @@ index a4924dc..1683b4b 100644
 +    lineage_zephyr-cp2a-userdebug \
 +    lineage_zephyr-cp2a-eng
 diff --git a/lineage_zephyr.mk b/lineage_zephyr.mk
-index 9d07081..7f23162 100644
+index 9d07081..3536a11 100644
 --- a/lineage_zephyr.mk
 +++ b/lineage_zephyr.mk
-@@ -3,6 +3,26 @@
+@@ -3,6 +3,33 @@
  # SPDX-License-Identifier: Apache-2.0
  #
  
@@ -40,13 +40,20 @@ index 9d07081..7f23162 100644
 +# Blur support (RisingOS' ro.custom.blur.enable and SF background blur)
 +TARGET_ENABLE_BLUR := true
 +
-+# Vanilla build: no GMS, no vendor/gapps tree
++# Package variant. The default is the VANILLA build. Export ZEPHYR_GMS=true
++# before lunch to build the full GMS package from RisingOS' vendor/gms tree
++# (gms_full.mk: Play Store, Play services, Pixel launcher and the rest);
++# RISING_PACKAGE_TYPE then becomes GAPPS and the OTA is named accordingly.
++ifeq ($(ZEPHYR_GMS),true)
++WITH_GMS := true
++else
 +WITH_GMS := false
++endif
 +
  # Inherit from those products. Most specific first.
  #
  # Still core_64_bit_only.mk: stock runs zygote64_32, but this tree cannot build
-@@ -31,12 +51,10 @@ $(call inherit-product, vendor/lineage/config/common_full_phone.mk)
+@@ -31,12 +58,10 @@ $(call inherit-product, vendor/lineage/config/common_full_phone.mk)
  # Inherit the hardware configuration for the actual device
  $(call inherit-product, device/xiaomi/zephyr/device.mk)
  
