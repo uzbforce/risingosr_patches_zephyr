@@ -1,0 +1,93 @@
+From: uzbforce <oktamovazizbek2010@gmail.com>
+Subject: [system/sepolicy] sync the current policy changes
+
+diff --git a/private/compat/202404/202404.ignore.cil b/private/compat/202404/202404.ignore.cil
+index c6ccb591c..e20d0fea8 100644
+--- a/private/compat/202404/202404.ignore.cil
++++ b/private/compat/202404/202404.ignore.cil
+@@ -5,6 +5,8 @@
+ (typeattribute new_objects)
+ (typeattributeset new_objects
+   ( new_objects
++    qcom_atel_ready
++    sysfs_brightness_clone
+     app_function_service
+     binderfs_logs_transaction_history
+     binderfs_logs_transactions
+diff --git a/private/compat/202504/202504.ignore.cil b/private/compat/202504/202504.ignore.cil
+index a45d73e50..645b77296 100644
+--- a/private/compat/202504/202504.ignore.cil
++++ b/private/compat/202504/202504.ignore.cil
+@@ -5,6 +5,8 @@
+ (typeattribute new_objects)
+ (typeattributeset new_objects
+   ( new_objects
++    qcom_atel_ready
++    sysfs_brightness_clone
+     aisealhostservice
+     aiseal_data_file
+     binderfs_logs_state_hashed
+diff --git a/private/compat/202604/202604.ignore.cil b/private/compat/202604/202604.ignore.cil
+index dd914723f..acf6cfaad 100644
+--- a/private/compat/202604/202604.ignore.cil
++++ b/private/compat/202604/202604.ignore.cil
+@@ -5,5 +5,7 @@
+ (typeattribute new_objects)
+ (typeattributeset new_objects
+   ( new_objects
++    qcom_atel_ready
++    sysfs_brightness_clone
+     
+   ))
+diff --git a/private/compat/31.0/31.0.ignore.cil b/private/compat/31.0/31.0.ignore.cil
+index 0e39f3ec3..3943fd4bd 100644
+--- a/private/compat/31.0/31.0.ignore.cil
++++ b/private/compat/31.0/31.0.ignore.cil
+@@ -5,6 +5,8 @@
+ (typeattribute new_objects)
+ (typeattributeset new_objects
+   ( new_objects
++    qcom_atel_ready
++    sysfs_brightness_clone
+     apexd_select_prop
+     artd_service
+     attestation_verification_service
+diff --git a/private/compat/32.0/32.0.ignore.cil b/private/compat/32.0/32.0.ignore.cil
+index dd74cd82f..d6849a442 100644
+--- a/private/compat/32.0/32.0.ignore.cil
++++ b/private/compat/32.0/32.0.ignore.cil
+@@ -5,6 +5,8 @@
+ (typeattribute new_objects)
+ (typeattributeset new_objects
+   ( new_objects
++    qcom_atel_ready
++    sysfs_brightness_clone
+     adaptive_haptics_prop
+     adservices_manager_service
+     apexd_select_prop
+diff --git a/private/compat/33.0/33.0.ignore.cil b/private/compat/33.0/33.0.ignore.cil
+index f041d97b6..30d2e31be 100644
+--- a/private/compat/33.0/33.0.ignore.cil
++++ b/private/compat/33.0/33.0.ignore.cil
+@@ -5,6 +5,8 @@
+ (typeattribute new_objects)
+ (typeattributeset new_objects
+   ( new_objects
++    qcom_atel_ready
++    sysfs_brightness_clone
+     adaptive_haptics_prop
+     apex_ready_prop
+     art_boot
+diff --git a/private/compat/34.0/34.0.ignore.cil b/private/compat/34.0/34.0.ignore.cil
+index b82f8317a..0256778c0 100644
+--- a/private/compat/34.0/34.0.ignore.cil
++++ b/private/compat/34.0/34.0.ignore.cil
+@@ -5,6 +5,8 @@
+ (typeattribute new_objects)
+ (typeattributeset new_objects
+   ( new_objects
++    qcom_atel_ready
++    sysfs_brightness_clone
+     archive_service
+     artd_pre_reboot_service
+     contextual_search_service

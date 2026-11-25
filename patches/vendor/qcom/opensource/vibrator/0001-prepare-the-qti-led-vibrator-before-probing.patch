@@ -1,0 +1,91 @@
+From: uzbforce <oktamovazizbek2010@gmail.com>
+Subject: [vendor/qcom/opensource/vibrator] prepare the qti led vibrator before probing
+
+diff --git a/aidl/VibratorOL/Vibrator.cpp b/aidl/VibratorOL/Vibrator.cpp
+index e470dfb..24f0d3b 100644
+--- a/aidl/VibratorOL/Vibrator.cpp
++++ b/aidl/VibratorOL/Vibrator.cpp
+@@ -402,12 +402,32 @@ LedVibratorDevice::LedVibratorDevice() {
+     mDetected = false;
+     mIsLdo = false;
+ 
++    // Selecting the transient trigger creates activate/duration/state. init
++    // may start this HAL before its own late-init write, and a previous
++    // writer may have cleared the trigger, so select it before probing.
++    //
++    // Select it only when the attributes are missing. Writing the trigger
++    // makes led_trigger_set() deactivate and reactivate it, and the transient
++    // trigger deletes and recreates activate/duration/state on activation.
++    // Those files are recreated root:root 0644, which discards init's chown
++    // and leaves this process (uid system) unable to open them - every
++    // restart would silently turn the vibrator into a no-op.
+     snprintf(devicename, sizeof(devicename), "%s/%s", LED_DEVICE, "activate");
+     fd = TEMP_FAILURE_RETRY(open(devicename, O_RDWR));
++    if (fd < 0 && errno == ENOENT) {
++        snprintf(devicename, sizeof(devicename), "%s/%s", LED_DEVICE, "trigger");
++        if (write_value(devicename, "transient") < 0)
++            ALOGE("Failed to select transient LED trigger");
++
++        snprintf(devicename, sizeof(devicename), "%s/%s", LED_DEVICE, "activate");
++        fd = TEMP_FAILURE_RETRY(open(devicename, O_RDWR));
++    }
+     if (fd < 0) {
+-        ALOGE("open %s failed, errno = %d", devicename, errno);
++        ALOGE("open %s failed, errno = %d; vibrator disabled until init fixes ownership",
++              devicename, errno);
+         return;
+     }
++    close(fd);
+ 
+     mDetected = true;
+ 
+@@ -622,7 +642,10 @@ ndk::ScopedAStatus VibratorOL::on(int32_t timeoutMs,
+                                 const std::shared_ptr<IVibratorCallback>& callback) {
+     int ret;
+ 
+-    if (ledVib.mIsLdo) {
++    if (ledVib.mDetected) {
++        // The LED path is a QPNP LDO vibrator on zephyr. Clamp whenever the
++        // LED was detected, since the driver minimum applies even if the
++        // device/driver probe could not identify it as LDO.
+         // See QPNP_VIB_MIN_PLAY_MS, QPNP_VIB_MAX_PLAY_MS in leds-qpnp-vibrator-ldo.c
+         timeoutMs = std::clamp(timeoutMs, 50, 15000);
+     }
+diff --git a/aidl/VibratorSelector/VibratorSelector.cpp b/aidl/VibratorSelector/VibratorSelector.cpp
+index e1f8a4b..745ac1e 100644
+--- a/aidl/VibratorSelector/VibratorSelector.cpp
++++ b/aidl/VibratorSelector/VibratorSelector.cpp
+@@ -33,6 +33,7 @@
+  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
++#include <memory>
+ #include <errno.h>
+ #include <log/log.h>
+ #include <string>
+diff --git a/aidl/vendor.qti.hardware.vibrator.service.rc b/aidl/vendor.qti.hardware.vibrator.service.rc
+index f2b81bd..e9dfe95 100644
+--- a/aidl/vendor.qti.hardware.vibrator.service.rc
++++ b/aidl/vendor.qti.hardware.vibrator.service.rc
+@@ -4,5 +4,20 @@ service vendor.qti.vibrator /vendor/bin/hw/vendor.qti.hardware.vibrator.service
+     group system input wakelock
+     capabilities BLOCK_SUSPEND
+ 
+-on post-fs-data
++# The vibrator LED is leds-qpnp-vibrator-ldo, which is a module: neither
++# /sys/class/leds/vibrator nor its transient-trigger attributes exist yet at
++# post-fs-data. The attributes are created when the trigger is selected, so
++# re-select it once boot has completed and hand them to the HAL's uid before
++# restarting the HAL. The HAL no longer rewrites the trigger on probe, so these
++# ownership/mode changes survive its restarts.
++on property:sys.boot_completed=1
+     write /sys/class/leds/vibrator/trigger "transient"
++    chown system system /sys/class/leds/vibrator/activate
++    chmod 0660 /sys/class/leds/vibrator/activate
++    chown system system /sys/class/leds/vibrator/duration
++    chmod 0660 /sys/class/leds/vibrator/duration
++    chown system system /sys/class/leds/vibrator/state
++    chmod 0660 /sys/class/leds/vibrator/state
++    chown system system /sys/class/leds/vibrator/trigger
++    chmod 0660 /sys/class/leds/vibrator/trigger
++    restart vendor.qti.vibrator

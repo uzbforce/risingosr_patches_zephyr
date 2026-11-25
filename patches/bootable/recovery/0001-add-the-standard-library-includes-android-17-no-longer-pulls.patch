@@ -1,0 +1,739 @@
+From: uzbforce <oktamovazizbek2010@gmail.com>
+Subject: [bootable/recovery] add the standard library includes Android 17 no longer pulls in
+
+diff --git a/fuse_sideload/fuse_provider.cpp b/fuse_sideload/fuse_provider.cpp
+index 2183d084..ee6409b5 100644
+--- a/fuse_sideload/fuse_provider.cpp
++++ b/fuse_sideload/fuse_provider.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <string>
+ #include "fuse_provider.h"
+ 
+ #include <errno.h>
+diff --git a/fuse_sideload/fuse_sideload.cpp b/fuse_sideload/fuse_sideload.cpp
+index cb1db185..eb427009 100644
+--- a/fuse_sideload/fuse_sideload.cpp
++++ b/fuse_sideload/fuse_sideload.cpp
+@@ -41,6 +41,7 @@
+ // two files is implemented.  In particular, you can't opendir() or
+ // readdir() on the "/sideload" directory; ls on it won't work.
+ 
++#include <memory>
+ #include "fuse_sideload.h"
+ 
+ #include <errno.h>
+diff --git a/install/adb_install.cpp b/install/adb_install.cpp
+index 24b937b3..025ec097 100644
+--- a/install/adb_install.cpp
++++ b/install/adb_install.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "install/adb_install.h"
+ 
+ #include <errno.h>
+diff --git a/install/include/install/fuse_install.h b/install/include/install/fuse_install.h
+index 918dcc15..ce4b0021 100644
+--- a/install/include/install/fuse_install.h
++++ b/install/include/install/fuse_install.h
+@@ -16,6 +16,7 @@
+ 
+ #pragma once
+ 
++#include <string>
+ #include <string_view>
+ 
+ #include "install/install.h"
+diff --git a/install/include/install/spl_check.h b/install/include/install/spl_check.h
+index e0bfc62c..ceb07c22 100644
+--- a/install/include/install/spl_check.h
++++ b/install/include/install/spl_check.h
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include <string_view>
+ 
+ #include <android-base/logging.h>
+diff --git a/install/include/install/wipe_data.h b/install/include/install/wipe_data.h
+index 0890a4b0..49cc95e7 100644
+--- a/install/include/install/wipe_data.h
++++ b/install/include/install/wipe_data.h
+@@ -16,6 +16,7 @@
+ 
+ #pragma once
+ 
++#include <string>
+ #include <functional>
+ 
+ #include "recovery_ui/device.h"
+diff --git a/install/install.cpp b/install/install.cpp
+index 2e8b7655..5f3019cc 100644
+--- a/install/install.cpp
++++ b/install/install.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <map>
++#include <string>
+ #include "install/install.h"
+ 
+ #include <ctype.h>
+diff --git a/install/spl_check.cpp b/install/spl_check.cpp
+index a4e56d43..685eb2a4 100644
+--- a/install/spl_check.cpp
++++ b/install/spl_check.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
++#include <vector>
+ #include "install/spl_check.h"
+ 
+ bool ViolatesSPLDowngrade(const build::tools::releasetools::OtaMetadata& metadata,
+diff --git a/install/wipe_data.cpp b/install/wipe_data.cpp
+index 6cce36c6..3d73d331 100644
+--- a/install/wipe_data.cpp
++++ b/install/wipe_data.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "install/wipe_data.h"
+ 
+ #include <fcntl.h>
+diff --git a/minadbd/minadbd.cpp b/minadbd/minadbd.cpp
+index af1a176e..2fc906b5 100644
+--- a/minadbd/minadbd.cpp
++++ b/minadbd/minadbd.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <signal.h>
+diff --git a/minui/events.cpp b/minui/events.cpp
+index 30ddbc89..e1755271 100644
+--- a/minui/events.cpp
++++ b/minui/events.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <vector>
+ #include <dirent.h>
+ #include <errno.h>
+ #include <fcntl.h>
+diff --git a/minui/graphics.cpp b/minui/graphics.cpp
+index 94ebcbc3..21c89a08 100644
+--- a/minui/graphics.cpp
++++ b/minui/graphics.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "graphics.h"
+ 
+ #include <stdint.h>
+diff --git a/minui/graphics_drm.cpp b/minui/graphics_drm.cpp
+index bc732119..203ad5db 100644
+--- a/minui/graphics_drm.cpp
++++ b/minui/graphics_drm.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <vector>
+ #include "graphics_drm.h"
+ 
+ #include <fcntl.h>
+diff --git a/minui/graphics_drm_qti.cpp b/minui/graphics_drm_qti.cpp
+index aa7dadb6..1de3c423 100644
+--- a/minui/graphics_drm_qti.cpp
++++ b/minui/graphics_drm_qti.cpp
+@@ -40,6 +40,7 @@
+  * IN THE SOFTWARE.
+  */
+ 
++#include <vector>
+ #include "graphics_drm_qti.h"
+ 
+ #include <errno.h>
+diff --git a/minui/graphics_drm_qti.h b/minui/graphics_drm_qti.h
+index b8f0c660..1e61f449 100644
+--- a/minui/graphics_drm_qti.h
++++ b/minui/graphics_drm_qti.h
+@@ -16,6 +16,7 @@
+ 
+ #pragma once
+ 
++#include <string>
+ #include <stddef.h>
+ #include <stdint.h>
+ 
+diff --git a/minui/graphics_fbdev.cpp b/minui/graphics_fbdev.cpp
+index c3e9c108..c115cb6d 100644
+--- a/minui/graphics_fbdev.cpp
++++ b/minui/graphics_fbdev.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "graphics_fbdev.h"
+ 
+ #include <fcntl.h>
+diff --git a/otautil/include/otautil/verifier.h b/otautil/include/otautil/verifier.h
+index f9e94758..66df1961 100644
+--- a/otautil/include/otautil/verifier.h
++++ b/otautil/include/otautil/verifier.h
+@@ -16,6 +16,7 @@
+ 
+ #pragma once
+ 
++#include <string>
+ #include <stdint.h>
+ 
+ #include <functional>
+diff --git a/otautil/package.cpp b/otautil/package.cpp
+index 242204ee..fd34bd4f 100644
+--- a/otautil/package.cpp
++++ b/otautil/package.cpp
+@@ -14,6 +14,10 @@
+  * limitations under the License.
+  */
+ 
++#include <functional>
++#include <memory>
++#include <string>
++#include <vector>
+ #include "otautil/package.h"
+ 
+ #include <string.h>
+diff --git a/otautil/rangeset.cpp b/otautil/rangeset.cpp
+index 8ee99dd7..bec7902c 100644
+--- a/otautil/rangeset.cpp
++++ b/otautil/rangeset.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <optional>
+ #include "otautil/rangeset.h"
+ 
+ #include <limits.h>
+diff --git a/otautil/verifier.cpp b/otautil/verifier.cpp
+index 83ad7082..917a88c2 100644
+--- a/otautil/verifier.cpp
++++ b/otautil/verifier.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "otautil/verifier.h"
+ 
+ #include <errno.h>
+diff --git a/otautil/ziputil.cpp b/otautil/ziputil.cpp
+index 598bb7cc..8245c006 100644
+--- a/otautil/ziputil.cpp
++++ b/otautil/ziputil.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
+ #include "otautil/ziputil.h"
+ 
+ #include <errno.h>
+diff --git a/recovery_ui/device.cpp b/recovery_ui/device.cpp
+index db357d72..0e779829 100644
+--- a/recovery_ui/device.cpp
++++ b/recovery_ui/device.cpp
+@@ -15,6 +15,7 @@
+  * limitations under the License.
+  */
+ 
++#include <optional>
+ #include "recovery_ui/device.h"
+ 
+ #include <algorithm>
+diff --git a/recovery_ui/ethernet_device.cpp b/recovery_ui/ethernet_device.cpp
+index d59561ef..d5943578 100644
+--- a/recovery_ui/ethernet_device.cpp
++++ b/recovery_ui/ethernet_device.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <string>
+ #include <android-base/logging.h>
+ #include <android-base/properties.h>
+ #include <android-base/strings.h>
+diff --git a/recovery_ui/ethernet_ui.cpp b/recovery_ui/ethernet_ui.cpp
+index 18156c96..b6b49a55 100644
+--- a/recovery_ui/ethernet_ui.cpp
++++ b/recovery_ui/ethernet_ui.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
++#include <vector>
+ #include "recovery_ui/ethernet_ui.h"
+ 
+ #include <android-base/logging.h>
+diff --git a/recovery_ui/include/recovery_ui/ethernet_device.h b/recovery_ui/include/recovery_ui/ethernet_device.h
+index 2e020380..b11d5f98 100644
+--- a/recovery_ui/include/recovery_ui/ethernet_device.h
++++ b/recovery_ui/include/recovery_ui/ethernet_device.h
+@@ -17,6 +17,7 @@
+ #ifndef _ETHERNET_RECOVERY_DEVICE_H
+ #define _ETHERNET_RECOVERY_DEVICE_H
+ 
++#include <string>
+ #include "device.h"
+ 
+ #include <android-base/unique_fd.h>
+diff --git a/recovery_ui/include/recovery_ui/ethernet_ui.h b/recovery_ui/include/recovery_ui/ethernet_ui.h
+index 2410c1c6..1f12c4e5 100644
+--- a/recovery_ui/include/recovery_ui/ethernet_ui.h
++++ b/recovery_ui/include/recovery_ui/ethernet_ui.h
+@@ -17,6 +17,8 @@
+ #ifndef RECOVERY_ETHERNET_UI_H
+ #define RECOVERY_ETHERNET_UI_H
+ 
++#include <string>
++#include <vector>
+ #include "screen_ui.h"
+ 
+ class EthernetRecoveryUI : public ScreenRecoveryUI {
+diff --git a/recovery_ui/include/recovery_ui/screen_ui.h b/recovery_ui/include/recovery_ui/screen_ui.h
+index 32990fb3..83e5a286 100644
+--- a/recovery_ui/include/recovery_ui/screen_ui.h
++++ b/recovery_ui/include/recovery_ui/screen_ui.h
+@@ -17,6 +17,7 @@
+ #ifndef RECOVERY_SCREEN_UI_H
+ #define RECOVERY_SCREEN_UI_H
+ 
++#include <mutex>
+ #include <stdio.h>
+ 
+ #include <atomic>
+diff --git a/recovery_ui/screen_ui.cpp b/recovery_ui/screen_ui.cpp
+index 0dcc4c6d..2232e526 100644
+--- a/recovery_ui/screen_ui.cpp
++++ b/recovery_ui/screen_ui.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <functional>
++#include <mutex>
+ #include "recovery_ui/screen_ui.h"
+ 
+ #include <dirent.h>
+diff --git a/recovery_ui/stub_ui.cpp b/recovery_ui/stub_ui.cpp
+index cabbd5f2..957b5f86 100644
+--- a/recovery_ui/stub_ui.cpp
++++ b/recovery_ui/stub_ui.cpp
+@@ -14,6 +14,9 @@
+  * limitations under the License.
+  */
+ 
++#include <functional>
++#include <string>
++#include <vector>
+ #include "recovery_ui/stub_ui.h"
+ 
+ #include <android-base/logging.h>
+diff --git a/recovery_ui/ui.cpp b/recovery_ui/ui.cpp
+index 18c44982..f2eb4afc 100644
+--- a/recovery_ui/ui.cpp
++++ b/recovery_ui/ui.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <mutex>
+ #include "recovery_ui/ui.h"
+ 
+ #include <errno.h>
+diff --git a/recovery_ui/vr_ui.cpp b/recovery_ui/vr_ui.cpp
+index 5b9b1b4e..5ba55645 100644
+--- a/recovery_ui/vr_ui.cpp
++++ b/recovery_ui/vr_ui.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "recovery_ui/vr_ui.h"
+ 
+ #include <android-base/properties.h>
+diff --git a/recovery_utils/battery_utils.cpp b/recovery_utils/battery_utils.cpp
+index 6b126bdf..83d99f1e 100644
+--- a/recovery_utils/battery_utils.cpp
++++ b/recovery_utils/battery_utils.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <string>
+ #include "recovery_utils/battery_utils.h"
+ 
+ #include <stdint.h>
+diff --git a/recovery_utils/logging.cpp b/recovery_utils/logging.cpp
+index 52f12a8d..5bcefcd6 100644
+--- a/recovery_utils/logging.cpp
++++ b/recovery_utils/logging.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <vector>
+ #include "recovery_utils/logging.h"
+ 
+ #include <dirent.h>
+diff --git a/recovery_utils/parse_install_logs.cpp b/recovery_utils/parse_install_logs.cpp
+index c8631762..c1e5dd65 100644
+--- a/recovery_utils/parse_install_logs.cpp
++++ b/recovery_utils/parse_install_logs.cpp
+@@ -14,6 +14,9 @@
+  * limitations under the License.
+  */
+ 
++#include <map>
++#include <string>
++#include <vector>
+ #include "recovery_utils/parse_install_logs.h"
+ 
+ #include <unistd.h>
+diff --git a/recovery_utils/roots.cpp b/recovery_utils/roots.cpp
+index 50f6cc44..74a98992 100644
+--- a/recovery_utils/roots.cpp
++++ b/recovery_utils/roots.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <algorithm>
+ #include "recovery_utils/roots.h"
+ 
+ #include <fcntl.h>
+diff --git a/tests/fuzz/verify_package_fuzzer.cpp b/tests/fuzz/verify_package_fuzzer.cpp
+index 36c85346..9d2cbffc 100644
+--- a/tests/fuzz/verify_package_fuzzer.cpp
++++ b/tests/fuzz/verify_package_fuzzer.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <vector>
+ #include "fuzzer/FuzzedDataProvider.h"
+ 
+ #include "install/install.h"
+diff --git a/tests/unit/install_test.cpp b/tests/unit/install_test.cpp
+index c3415479..46a8cb19 100644
+--- a/tests/unit/install_test.cpp
++++ b/tests/unit/install_test.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <map>
+ #include <stdio.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
+diff --git a/tests/unit/package_test.cpp b/tests/unit/package_test.cpp
+index 66882bb4..1046bbaf 100644
+--- a/tests/unit/package_test.cpp
++++ b/tests/unit/package_test.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
+ #include <stdio.h>
+ 
+ #include <functional>
+diff --git a/tests/unit/sysutil_test.cpp b/tests/unit/sysutil_test.cpp
+index 64b8956f..9ad7b9a1 100644
+--- a/tests/unit/sysutil_test.cpp
++++ b/tests/unit/sysutil_test.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <vector>
+ #include <string>
+ 
+ #include <android-base/file.h>
+diff --git a/tests/unit/verifier_test.cpp b/tests/unit/verifier_test.cpp
+index 08a3ddfc..b3f25ae2 100644
+--- a/tests/unit/verifier_test.cpp
++++ b/tests/unit/verifier_test.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <stdio.h>
+diff --git a/tests/unit/zip_test.cpp b/tests/unit/zip_test.cpp
+index 903c9dbf..af055a8e 100644
+--- a/tests/unit/zip_test.cpp
++++ b/tests/unit/zip_test.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include <errno.h>
+ #include <unistd.h>
+ 
+diff --git a/update_verifier/update_verifier.cpp b/update_verifier/update_verifier.cpp
+index 03b3741e..3e764a01 100644
+--- a/update_verifier/update_verifier.cpp
++++ b/update_verifier/update_verifier.cpp
+@@ -37,6 +37,10 @@
+  * after the verification.
+  */
+ 
++#include <functional>
++#include <map>
++#include <string>
++#include <vector>
+ #include "update_verifier/update_verifier.h"
+ 
+ #include <dirent.h>
+diff --git a/volclient.cpp b/volclient.cpp
+index b775370d..fddb7ff6 100644
+--- a/volclient.cpp
++++ b/volclient.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
++#include <vector>
+ #include "volclient.h"
+ #include <volume_manager/ResponseCode.h>
+ 
+diff --git a/volclient.h b/volclient.h
+index e5340684..f3a5b10f 100644
+--- a/volclient.h
++++ b/volclient.h
+@@ -17,6 +17,8 @@
+ #ifndef _RECOVERY_VOLCLIENT_H
+ #define _RECOVERY_VOLCLIENT_H
+ 
++#include <string>
++#include <vector>
+ #include <volume_manager/VolumeManager.h>
+ #include "recovery_ui/device.h"
+ 
+diff --git a/volume_manager/Disk.cpp b/volume_manager/Disk.cpp
+index 631da8d5..79e95e0c 100644
+--- a/volume_manager/Disk.cpp
++++ b/volume_manager/Disk.cpp
+@@ -15,6 +15,8 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <string>
+ #include "Disk.h"
+ #include "PublicVolume.h"
+ #include <volume_manager/ResponseCode.h>
+diff --git a/volume_manager/Disk.h b/volume_manager/Disk.h
+index d38053d9..84c0645e 100644
+--- a/volume_manager/Disk.h
++++ b/volume_manager/Disk.h
+@@ -18,6 +18,8 @@
+ #ifndef ANDROID_VOLMGR_DISK_H
+ #define ANDROID_VOLMGR_DISK_H
+ 
++#include <memory>
++#include <string>
+ #include "Utils.h"
+ #include "VolumeBase.h"
+ 
+diff --git a/volume_manager/DiskPartition.cpp b/volume_manager/DiskPartition.cpp
+index 26ac6f54..a4bc10ba 100644
+--- a/volume_manager/DiskPartition.cpp
++++ b/volume_manager/DiskPartition.cpp
+@@ -15,6 +15,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "DiskPartition.h"
+ #include "PublicVolume.h"
+ #include <volume_manager/ResponseCode.h>
+diff --git a/volume_manager/DiskPartition.h b/volume_manager/DiskPartition.h
+index 0f395839..b76324f3 100644
+--- a/volume_manager/DiskPartition.h
++++ b/volume_manager/DiskPartition.h
+@@ -18,6 +18,7 @@
+ #ifndef ANDROID_VOLMGR_DISKPARTITION_H
+ #define ANDROID_VOLMGR_DISKPARTITION_H
+ 
++#include <string>
+ #include "Disk.h"
+ 
+ namespace android {
+diff --git a/volume_manager/EmulatedVolume.cpp b/volume_manager/EmulatedVolume.cpp
+index a1a0756c..b4389547 100644
+--- a/volume_manager/EmulatedVolume.cpp
++++ b/volume_manager/EmulatedVolume.cpp
+@@ -15,6 +15,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "EmulatedVolume.h"
+ #include <volume_manager/ResponseCode.h>
+ #include <volume_manager/VolumeManager.h>
+diff --git a/volume_manager/EmulatedVolume.h b/volume_manager/EmulatedVolume.h
+index 66421ccb..bed94bda 100644
+--- a/volume_manager/EmulatedVolume.h
++++ b/volume_manager/EmulatedVolume.h
+@@ -18,6 +18,7 @@
+ #ifndef ANDROID_VOLMGR_EMULATED_VOLUME_H
+ #define ANDROID_VOLMGR_EMULATED_VOLUME_H
+ 
++#include <string>
+ #include "VolumeBase.h"
+ 
+ #include <cutils/multiuser.h>
+diff --git a/volume_manager/Process.cpp b/volume_manager/Process.cpp
+index 387d8d31..9a2ad8cf 100644
+--- a/volume_manager/Process.cpp
++++ b/volume_manager/Process.cpp
+@@ -15,6 +15,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include <ctype.h>
+ #include <dirent.h>
+ #include <errno.h>
+diff --git a/volume_manager/PublicVolume.cpp b/volume_manager/PublicVolume.cpp
+index b04135fd..4d2607aa 100644
+--- a/volume_manager/PublicVolume.cpp
++++ b/volume_manager/PublicVolume.cpp
+@@ -15,6 +15,8 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
++#include <algorithm>
+ #include "PublicVolume.h"
+ #include <volume_manager/ResponseCode.h>
+ #include <volume_manager/VolumeManager.h>
+diff --git a/volume_manager/PublicVolume.h b/volume_manager/PublicVolume.h
+index c740c34c..aaa32883 100644
+--- a/volume_manager/PublicVolume.h
++++ b/volume_manager/PublicVolume.h
+@@ -18,6 +18,7 @@
+ #ifndef ANDROID_VOLMGR_PUBLIC_VOLUME_H
+ #define ANDROID_VOLMGR_PUBLIC_VOLUME_H
+ 
++#include <string>
+ #include "VolumeBase.h"
+ 
+ #include <cutils/multiuser.h>
+diff --git a/volume_manager/Utils.cpp b/volume_manager/Utils.cpp
+index 1a0a9403..d2a4f35a 100644
+--- a/volume_manager/Utils.cpp
++++ b/volume_manager/Utils.cpp
+@@ -15,6 +15,8 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
++#include <vector>
+ #include "Utils.h"
+ #include <volume_manager/VolumeManager.h>
+ #include "Process.h"
+diff --git a/volume_manager/VolumeBase.cpp b/volume_manager/VolumeBase.cpp
+index bd7c29cd..7beecc19 100644
+--- a/volume_manager/VolumeBase.cpp
++++ b/volume_manager/VolumeBase.cpp
+@@ -15,6 +15,8 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
++#include <vector>
+ #include "VolumeBase.h"
+ #include <volume_manager/ResponseCode.h>
+ #include <volume_manager/VolumeManager.h>
+diff --git a/volume_manager/VolumeManager.cpp b/volume_manager/VolumeManager.cpp
+index 11e6b9e2..ab03d8de 100644
+--- a/volume_manager/VolumeManager.cpp
++++ b/volume_manager/VolumeManager.cpp
+@@ -15,6 +15,9 @@
+  * limitations under the License.
+  */
+ 
++#include <mutex>
++#include <string>
++#include <vector>
+ #include <blkid/blkid.h>
+ #include <dirent.h>
+ #include <fcntl.h>
+diff --git a/volume_manager/fs/Iso9660.cpp b/volume_manager/fs/Iso9660.cpp
+index 5f3e4f4d..3897917e 100644
+--- a/volume_manager/fs/Iso9660.cpp
++++ b/volume_manager/fs/Iso9660.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include <stdio.h>
+ #include <sys/mount.h>
+ #include <utils/Errors.h>
+diff --git a/volume_manager/fs/Vfat.cpp b/volume_manager/fs/Vfat.cpp
+index 395664a3..74fc4380 100644
+--- a/volume_manager/fs/Vfat.cpp
++++ b/volume_manager/fs/Vfat.cpp
+@@ -15,6 +15,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include <dirent.h>
+ #include <errno.h>
+ #include <fcntl.h>
+diff --git a/volume_manager/include/volume_manager/VolumeManager.h b/volume_manager/include/volume_manager/VolumeManager.h
+index c2cb8dde..d72d0143 100644
+--- a/volume_manager/include/volume_manager/VolumeManager.h
++++ b/volume_manager/include/volume_manager/VolumeManager.h
+@@ -18,6 +18,7 @@
+ #ifndef _VOLMGR_VOLUME_MANAGER_H
+ #define _VOLMGR_VOLUME_MANAGER_H
+ 
++#include <vector>
+ #include <fnmatch.h>
+ #include <pthread.h>
+ #include <stdlib.h>

@@ -1,0 +1,65 @@
+From: uzbforce <oktamovazizbek2010@gmail.com>
+Subject: [device/xiaomi/zephyr] configure the RisingOS Revived product
+
+diff --git a/AndroidProducts.mk b/AndroidProducts.mk
+index a4924dc..1683b4b 100644
+--- a/AndroidProducts.mk
++++ b/AndroidProducts.mk
+@@ -7,6 +7,6 @@ PRODUCT_MAKEFILES := \
+     $(LOCAL_DIR)/lineage_zephyr.mk
+ 
+ COMMON_LUNCH_CHOICES := \
+-    lineage_zephyr-user \
+-    lineage_zephyr-userdebug \
+-    lineage_zephyr-eng
++    lineage_zephyr-cp2a-user \
++    lineage_zephyr-cp2a-userdebug \
++    lineage_zephyr-cp2a-eng
+diff --git a/lineage_zephyr.mk b/lineage_zephyr.mk
+index 9d07081..7f23162 100644
+--- a/lineage_zephyr.mk
++++ b/lineage_zephyr.mk
+@@ -3,6 +3,26 @@
+ # SPDX-License-Identifier: Apache-2.0
+ #
+ 
++# ---------------------------------------------------------------------------
++# RisingOS Revived flags
++#
++# These have to be set before vendor/lineage/config/common_full_phone.mk is
++# inherited: vendor/rising/config/properties.mk reads TARGET_ENABLE_BLUR with
++# ?= and vendor/lineage/config/common_full_phone.mk reads WITH_GMS with ?=.
++# ---------------------------------------------------------------------------
++RISING_MAINTAINER := uzbforce
++
++# ro.rising.chipset / ro.rising.maintainer, shown in Settings and the OTA JSON
++PRODUCT_BUILD_PROP_OVERRIDES += \
++    RisingChipset="Snapdragon 6s Gen2" \
++    RisingMaintainer="uzbforce"
++
++# Blur support (RisingOS' ro.custom.blur.enable and SF background blur)
++TARGET_ENABLE_BLUR := true
++
++# Vanilla build: no GMS, no vendor/gapps tree
++WITH_GMS := false
++
+ # Inherit from those products. Most specific first.
+ #
+ # Still core_64_bit_only.mk: stock runs zygote64_32, but this tree cannot build
+@@ -31,12 +51,10 @@ $(call inherit-product, vendor/lineage/config/common_full_phone.mk)
+ # Inherit the hardware configuration for the actual device
+ $(call inherit-product, device/xiaomi/zephyr/device.mk)
+ 
+-# Google apps. MindTheGapps is the package the LineageOS wiki points Android 16
+-# users at; vendor/gapps is the same project's inline-build tree, so the OTA
+-# ships GMS/Play Store/SetupWizard instead of asking for a separate sideload.
+-$(call inherit-product, vendor/gapps/arm64/arm64-vendor.mk)
+-
+-# Signing keys, when present
++# Signing keys, when present. These are the zephyr release keys: the OTA and
++# every APK signed with PRODUCT_DEFAULT_DEV_CERTIFICATE are signed with them,
++# so `mka bacon` produces a release-key-signed OTA without a separate signing
++# step.
+ -include vendor/lineage-priv/keys/keys.mk
+ 
+ # ---------------------------------------------------------------------------

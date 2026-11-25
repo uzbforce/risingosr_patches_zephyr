@@ -1,0 +1,97 @@
+From: uzbforce <oktamovazizbek2010@gmail.com>
+Subject: [packages/apps/Dialer] use the actual communication device for proximity blanking
+
+diff --git a/java/com/android/incallui/ProximitySensor.java b/java/com/android/incallui/ProximitySensor.java
+index c02ebf75e..6f1c7b93f 100644
+--- a/java/com/android/incallui/ProximitySensor.java
++++ b/java/com/android/incallui/ProximitySensor.java
+@@ -20,6 +20,8 @@ package com.android.incallui;
+ import android.content.Context;
+ import android.hardware.display.DisplayManager;
+ import android.hardware.display.DisplayManager.DisplayListener;
++import android.media.AudioDeviceInfo;
++import android.media.AudioManager;
+ import android.os.PowerManager;
+ import android.os.Trace;
+ import android.telecom.CallAudioState;
+@@ -49,6 +51,8 @@ public class ProximitySensor
+ 
+   private final PowerManager powerManager;
+   private final PowerManager.WakeLock proximityWakeLock;
++  private final AudioManager audioManager;
++  private final AudioManager.OnCommunicationDeviceChangedListener communicationDeviceListener;
+   private final AudioModeProvider audioModeProvider;
+   private final AccelerometerListener accelerometerListener;
+   private final ProximityDisplayListener displayListener;
+@@ -66,6 +70,8 @@ public class ProximitySensor
+       @NonNull AccelerometerListener accelerometerListener) {
+     Trace.beginSection("ProximitySensor.Constructor");
+     powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
++    audioManager = context.getSystemService(AudioManager.class);
++    communicationDeviceListener = device -> updateProximitySensorMode();
+     if (powerManager.isWakeLockLevelSupported(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK)) {
+       proximityWakeLock =
+           powerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, TAG);
+@@ -83,11 +89,14 @@ public class ProximitySensor
+ 
+     this.audioModeProvider = audioModeProvider;
+     this.audioModeProvider.addListener(this);
++    audioManager.addOnCommunicationDeviceChangedListener(
++        context.getMainExecutor(), communicationDeviceListener);
+     Trace.endSection();
+   }
+ 
+   public void tearDown() {
+     audioModeProvider.removeListener(this);
++    audioManager.removeOnCommunicationDeviceChangedListener(communicationDeviceListener);
+ 
+     accelerometerListener.enable(false);
+     displayListener.unregister();
+@@ -205,10 +214,14 @@ public class ProximitySensor
+    * <p>Proximity wake lock will be released if any of the following conditions are true: the audio
+    * is routed through bluetooth, a wired headset, or the speaker; the user requested, received a
+    * request for, or is in a video call; or the phone is horizontal while in a call.
++   *
++   * <p>Uses the communication device reported by AudioManager rather than Telecom's CallAudioState
++   * because Telecom can report a Bluetooth route while the SCO link is still pending; during that
++   * window audio is still on the earpiece and the screen must blank at the ear.
+    */
+   private synchronized void updateProximitySensorMode() {
+     Trace.beginSection("ProximitySensor.updateProximitySensorMode");
+-    final int audioRoute = audioModeProvider.getAudioState().getRoute();
++    final int audioRoute = getActualAudioRoute();
+ 
+     boolean screenOnImmediately =
+         (CallAudioState.ROUTE_WIRED_HEADSET == audioRoute
+@@ -255,6 +268,31 @@ public class ProximitySensor
+     Trace.endSection();
+   }
+ 
++  private int getActualAudioRoute() {
++    final AudioDeviceInfo device = audioManager.getCommunicationDevice();
++    if (device != null) {
++      switch (device.getType()) {
++        case AudioDeviceInfo.TYPE_BUILTIN_EARPIECE:
++          return CallAudioState.ROUTE_EARPIECE;
++        case AudioDeviceInfo.TYPE_BUILTIN_SPEAKER:
++          return CallAudioState.ROUTE_SPEAKER;
++        case AudioDeviceInfo.TYPE_WIRED_HEADSET:
++        case AudioDeviceInfo.TYPE_USB_HEADSET:
++          return CallAudioState.ROUTE_WIRED_HEADSET;
++        case AudioDeviceInfo.TYPE_BLUETOOTH_SCO:
++        case AudioDeviceInfo.TYPE_BLE_HEADSET:
++        case AudioDeviceInfo.TYPE_BLE_SPEAKER:
++        case AudioDeviceInfo.TYPE_HEARING_AID:
++          return CallAudioState.ROUTE_BLUETOOTH;
++        default:
++          break;
++      }
++    }
++
++    // AudioManager has not selected a communication device yet; fall back to Telecom's state.
++    return audioModeProvider.getAudioState().getRoute();
++  }
++
+   /**
+    * Implementation of a {@link DisplayListener} that maintains a binary state: Screen on vs screen
+    * off. Used by the proximity sensor manager to decide whether or not it needs to listen to

@@ -1,0 +1,28 @@
+From: uzbforce <oktamovazizbek2010@gmail.com>
+
+Subject: [tools/extract-utils] soong module names for symlinks must be valid identifiers
+
+diff --git a/extract_utils/makefiles.py b/extract_utils/makefiles.py
+index 1e0e259..7e1628b 100644
+--- a/extract_utils/makefiles.py
++++ b/extract_utils/makefiles.py
+@@ -6,6 +6,7 @@
+ from __future__ import annotations
+ 
+ import os
++import re
+ from collections import defaultdict
+ from contextlib import ExitStack, contextmanager
+ from json import JSONEncoder
+@@ -664,7 +665,10 @@ def write_symlink_package(
+     if '/' not in symlink:
+         symlink = f'{os.path.dirname(file.dst)}/{symlink}'
+     part, location = symlink.split('/', 1)
+-    package_name = symlink.replace('/', '_').replace('.', '_')
++    # A soong module name has to be a valid name, which rules out characters a
++    # path may contain (e.g. the toybox alias '[' in 'vendor/bin/['), so map
++    # everything outside the identifier charset to '_'.
++    package_name = re.sub(r'[^A-Za-z0-9_]', '_', symlink)
+ 
+     (
+         BpBuilder(encoder)

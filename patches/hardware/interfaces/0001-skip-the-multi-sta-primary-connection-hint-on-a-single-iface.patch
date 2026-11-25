@@ -1,0 +1,23 @@
+From: uzbforce <oktamovazizbek2010@gmail.com>
+Subject: [hardware/interfaces] skip the multi-sta primary connection hint on a single iface
+
+diff --git a/wifi/aidl/default/wifi_chip.cpp b/wifi/aidl/default/wifi_chip.cpp
+index 813cc8c473..72c59042fd 100644
+--- a/wifi/aidl/default/wifi_chip.cpp
++++ b/wifi/aidl/default/wifi_chip.cpp
+@@ -1324,6 +1324,15 @@ ndk::ScopedAStatus WifiChip::setLatencyModeInternal(IWifiChip::LatencyMode mode)
+ }
+ 
+ ndk::ScopedAStatus WifiChip::setMultiStaPrimaryConnectionInternal(const std::string& ifname) {
++    // Primary/secondary only has meaning when more than one STA iface is active. The
++    // framework sends this hint unconditionally, and some vendor drivers (QCA on
++    // sm6225) reject the underlying vendor command with -ENODEV when a single STA
++    // iface exists, which makes the vendor HAL tear itself down mid createStaIface.
++    if (sta_ifaces_.size() <= 1) {
++        LOG(DEBUG) << "Skipping multi-STA primary connection for " << ifname
++                   << ": only one STA iface";
++        return ndk::ScopedAStatus::ok();
++    }
+     auto legacy_status = legacy_hal_.lock()->multiStaSetPrimaryConnection(ifname);
+     return createWifiStatusFromLegacyError(legacy_status);
+ }

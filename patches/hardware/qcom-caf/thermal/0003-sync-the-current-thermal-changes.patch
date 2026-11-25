@@ -1,0 +1,36 @@
+From: uzbforce <oktamovazizbek2010@gmail.com>
+Subject: [hardware/qcom-caf/thermal] sync the current thermal changes
+
+diff --git a/thermalConfig.cpp b/thermalConfig.cpp
+index ecf547c..613eb77 100644
+--- a/thermalConfig.cpp
++++ b/thermalConfig.cpp
+@@ -152,15 +152,23 @@ namespace thermal {
+ 			true,
+ 		},
+ 		{
++			// zephyr reads xo-therm, which is the crystal/PMIC zone and idles at
++			// ~39.5 C with the screen on. The QRD table above (36.5/40/46.5/50/55,
++			// shared with bengal and trinket) therefore pinned the device at
++			// MODERATE from boot: `dumpsys thermalservice` reported
++			// "Thermal Status: 2" with skin=39.4 C, and every camera app warned
++			// about overheating and refused video recording before it started.
++			// Shift the whole ramp up by ~5 C so idle is NONE and only real
++			// camera/gaming heat reaches MODERATE and above.
+ 			TemperatureType::SKIN,
+ 			{ "xo-therm" },
+ 			"skin",
+ 			{
+-			[LIGHT] = 36500,
+-			[MODERATE] = 40000,
+-			[SEVERE] = 46500,
+-			[CRITICAL] = 50000,
+-			[EMERGENCY] = 55000,
++			[LIGHT] = 42000,
++			[MODERATE] = 45000,
++			[SEVERE] = 48000,
++			[CRITICAL] = 52000,
++			[EMERGENCY] = 58000,
+ 			[SHUTDOWN] = 95000,
+ 			},
+ 			true,

@@ -1,0 +1,721 @@
+From: uzbforce <oktamovazizbek2010@gmail.com>
+Subject: [system/vold] add the standard library includes Android 17 no longer pulls in
+
+diff --git a/AppFuseUtil.cpp b/AppFuseUtil.cpp
+index 711e70b..76885d2 100644
+--- a/AppFuseUtil.cpp
++++ b/AppFuseUtil.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "AppFuseUtil.h"
+ 
+ #include <sys/mount.h>
+diff --git a/Benchmark.cpp b/Benchmark.cpp
+index e81cd61..7554965 100644
+--- a/Benchmark.cpp
++++ b/Benchmark.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <mutex>
++#include <string>
+ #include "Benchmark.h"
+ #include "BenchmarkGen.h"
+ #include "VolumeManager.h"
+diff --git a/Checkpoint.cpp b/Checkpoint.cpp
+index 4de3039..017a976 100644
+--- a/Checkpoint.cpp
++++ b/Checkpoint.cpp
+@@ -15,6 +15,9 @@
+  */
+ 
+ #define LOG_TAG "Checkpoint"
++#include <cstdlib>
++#include <map>
++#include <mutex>
+ #include "Checkpoint.h"
+ #include "FsCrypt.h"
+ #include "KeyStorage.h"
+diff --git a/EncryptInplace.cpp b/EncryptInplace.cpp
+index 190bb83..65440d7 100644
+--- a/EncryptInplace.cpp
++++ b/EncryptInplace.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <string>
+ #include "EncryptInplace.h"
+ 
+ #include <ext4_utils/ext4.h>
+diff --git a/FileDeviceUtils.cpp b/FileDeviceUtils.cpp
+index c745b54..cf65b2a 100644
+--- a/FileDeviceUtils.cpp
++++ b/FileDeviceUtils.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <string>
+ #include "FileDeviceUtils.h"
+ 
+ #include <errno.h>
+diff --git a/FsCrypt.cpp b/FsCrypt.cpp
+index eb9a511..ed8b560 100644
+--- a/FsCrypt.cpp
++++ b/FsCrypt.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <vector>
+ #include "FsCrypt.h"
+ 
+ #include "Checkpoint.h"
+diff --git a/IdleMaint.cpp b/IdleMaint.cpp
+index 8a33f73..a266887 100644
+--- a/IdleMaint.cpp
++++ b/IdleMaint.cpp
+@@ -14,6 +14,9 @@
+  * limitations under the License.
+  */
+ 
++#include <cstdlib>
++#include <mutex>
++#include <string>
+ #include "IdleMaint.h"
+ #include "NvmeDeviceUtils.h"
+ #include "Utils.h"
+diff --git a/KeyStorage.cpp b/KeyStorage.cpp
+index 96836f0..8054b9a 100644
+--- a/KeyStorage.cpp
++++ b/KeyStorage.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "KeyStorage.h"
+ 
+ #include "Checkpoint.h"
+diff --git a/KeyUtil.cpp b/KeyUtil.cpp
+index 805776c..e82c7e0 100644
+--- a/KeyUtil.cpp
++++ b/KeyUtil.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <mutex>
+ #include "KeyUtil.h"
+ 
+ #include <iomanip>
+diff --git a/Keystore.cpp b/Keystore.cpp
+index fd8a887..26d653f 100644
+--- a/Keystore.cpp
++++ b/Keystore.cpp
+@@ -14,6 +14,10 @@
+  * limitations under the License.
+  */
+ 
++#include <functional>
++#include <optional>
++#include <string>
++#include <vector>
+ #include "Keystore.h"
+ 
+ #include <android-base/logging.h>
+diff --git a/Keystore.h b/Keystore.h
+index 9850f91..8a77674 100644
+--- a/Keystore.h
++++ b/Keystore.h
+@@ -16,6 +16,9 @@
+ #ifndef ANDROID_VOLD_KEYSTORE_H
+ #define ANDROID_VOLD_KEYSTORE_H
+ 
++#include <functional>
++#include <optional>
++#include <vector>
+ #include "KeyBuffer.h"
+ 
+ #include <memory>
+diff --git a/Loop.cpp b/Loop.cpp
+index 4c86788..19fa36f 100644
+--- a/Loop.cpp
++++ b/Loop.cpp
+@@ -16,6 +16,8 @@
+ 
+ #define ATRACE_TAG ATRACE_TAG_PACKAGE_MANAGER
+ 
++#include <memory>
++#include <string>
+ #include <dirent.h>
+ #include <errno.h>
+ #include <fcntl.h>
+diff --git a/MetadataCrypt.cpp b/MetadataCrypt.cpp
+index e435d7d..c6d6c51 100644
+--- a/MetadataCrypt.cpp
++++ b/MetadataCrypt.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <vector>
+ #include "MetadataCrypt.h"
+ #include "KeyBuffer.h"
+ 
+diff --git a/MetadataCrypt.h b/MetadataCrypt.h
+index 6c46237..087509d 100644
+--- a/MetadataCrypt.h
++++ b/MetadataCrypt.h
+@@ -17,6 +17,7 @@
+ #ifndef _METADATA_CRYPT_H
+ #define _METADATA_CRYPT_H
+ 
++#include <vector>
+ #include <string>
+ 
+ #include "KeyBuffer.h"
+diff --git a/MoveStorage.cpp b/MoveStorage.cpp
+index 54e28a9..9f71976 100644
+--- a/MoveStorage.cpp
++++ b/MoveStorage.cpp
+@@ -14,6 +14,10 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <mutex>
++#include <string>
++#include <vector>
+ #include "MoveStorage.h"
+ #include "Utils.h"
+ #include "VolumeManager.h"
+diff --git a/MoveStorage.h b/MoveStorage.h
+index 46f745f..81674d0 100644
+--- a/MoveStorage.h
++++ b/MoveStorage.h
+@@ -17,6 +17,7 @@
+ #ifndef ANDROID_VOLD_MOVE_STORAGE_H
+ #define ANDROID_VOLD_MOVE_STORAGE_H
+ 
++#include <memory>
+ #include "android/os/IVoldTaskListener.h"
+ #include "model/VolumeBase.h"
+ 
+diff --git a/NetlinkHandler.cpp b/NetlinkHandler.cpp
+index 2231cd1..c4f1088 100644
+--- a/NetlinkHandler.cpp
++++ b/NetlinkHandler.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include <errno.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/NvmeDeviceUtils.cpp b/NvmeDeviceUtils.cpp
+index fd26319..59f5d65 100644
+--- a/NvmeDeviceUtils.cpp
++++ b/NvmeDeviceUtils.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "Utils.h"
+ #include "VoldUtil.h"
+ #include "WriteBooster.h"
+diff --git a/NvmeDeviceUtils.h b/NvmeDeviceUtils.h
+index e986f62..7000e89 100644
+--- a/NvmeDeviceUtils.h
++++ b/NvmeDeviceUtils.h
+@@ -17,6 +17,7 @@
+ #ifndef ANDROID_VOLD_NVME_DEVICE_UTILS_H
+ #define ANDROID_VOLD_NVME_DEVICE_UTILS_H
+ 
++#include <string>
+ #include <cstdint>
+ 
+ namespace android {
+diff --git a/Process.cpp b/Process.cpp
+index 0115fb1..5c9b235 100644
+--- a/Process.cpp
++++ b/Process.cpp
+@@ -14,6 +14,9 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <string>
++#include <vector>
+ #include <ctype.h>
+ #include <dirent.h>
+ #include <errno.h>
+diff --git a/RandUtils.cpp b/RandUtils.cpp
+index 78791a5..08f95f1 100644
+--- a/RandUtils.cpp
++++ b/RandUtils.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "RandUtils.h"
+ 
+ #include <openssl/rand.h>
+diff --git a/Utils.cpp b/Utils.cpp
+index 860f04f..f477cb0 100644
+--- a/Utils.cpp
++++ b/Utils.cpp
+@@ -14,6 +14,9 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <string>
++#include <vector>
+ #include "Utils.h"
+ 
+ #include "Process.h"
+diff --git a/VoldNativeService.cpp b/VoldNativeService.cpp
+index 48b1464..705921f 100644
+--- a/VoldNativeService.cpp
++++ b/VoldNativeService.cpp
+@@ -16,6 +16,11 @@
+ 
+ #define ATRACE_TAG ATRACE_TAG_PACKAGE_MANAGER
+ 
++#include <memory>
++#include <mutex>
++#include <optional>
++#include <string>
++#include <vector>
+ #include "VoldNativeService.h"
+ 
+ #include <android-base/logging.h>
+diff --git a/VoldNativeService.h b/VoldNativeService.h
+index 366f6ac..8b104d6 100644
+--- a/VoldNativeService.h
++++ b/VoldNativeService.h
+@@ -17,6 +17,9 @@
+ #ifndef _VOLD_NATIVE_SERVICE_H_
+ #define _VOLD_NATIVE_SERVICE_H_
+ 
++#include <optional>
++#include <string>
++#include <vector>
+ #include <android-base/unique_fd.h>
+ #include <binder/BinderService.h>
+ 
+diff --git a/VoldNativeServiceValidation.cpp b/VoldNativeServiceValidation.cpp
+index 1d19141..1ef8321 100644
+--- a/VoldNativeServiceValidation.cpp
++++ b/VoldNativeServiceValidation.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "VoldNativeServiceValidation.h"
+ 
+ #include <android-base/stringprintf.h>
+diff --git a/VoldUtil.cpp b/VoldUtil.cpp
+index 0b404bb..de8872b 100644
+--- a/VoldUtil.cpp
++++ b/VoldUtil.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <optional>
++#include <string>
+ #include "VoldUtil.h"
+ #include "Utils.h"
+ 
+diff --git a/VoldUtil.h b/VoldUtil.h
+index 83b881d..34efe68 100644
+--- a/VoldUtil.h
++++ b/VoldUtil.h
+@@ -16,6 +16,7 @@
+ 
+ #pragma once
+ 
++#include <string>
+ #include <fstab/fstab.h>
+ 
+ extern android::fs_mgr::Fstab fstab_default;
+diff --git a/VolumeManager.cpp b/VolumeManager.cpp
+index 46c0004..eb4bcec 100644
+--- a/VolumeManager.cpp
++++ b/VolumeManager.cpp
+@@ -16,6 +16,10 @@
+ 
+ #define ATRACE_TAG ATRACE_TAG_PACKAGE_MANAGER
+ 
++#include <memory>
++#include <mutex>
++#include <string>
++#include <vector>
+ #include <dirent.h>
+ #include <errno.h>
+ #include <fcntl.h>
+diff --git a/VolumeManager.h b/VolumeManager.h
+index 28ff9c6..f454b2a 100644
+--- a/VolumeManager.h
++++ b/VolumeManager.h
+@@ -17,6 +17,8 @@
+ #ifndef ANDROID_VOLD_VOLUME_MANAGER_H
+ #define ANDROID_VOLD_VOLUME_MANAGER_H
+ 
++#include <memory>
++#include <vector>
+ #include <fnmatch.h>
+ #include <pthread.h>
+ #include <stdlib.h>
+diff --git a/WriteBooster.cpp b/WriteBooster.cpp
+index 1d5c1bc..4722751 100644
+--- a/WriteBooster.cpp
++++ b/WriteBooster.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "WriteBooster.h"
+ #include "Utils.h"
+ #include "VoldUtil.h"
+diff --git a/cryptfs.cpp b/cryptfs.cpp
+index fbebe64..a0c825e 100644
+--- a/cryptfs.cpp
++++ b/cryptfs.cpp
+@@ -23,6 +23,8 @@
+ 
+ #define LOG_TAG "Cryptfs"
+ 
++#include <memory>
++#include <string>
+ #include "cryptfs.h"
+ 
+ #include "CryptoType.h"
+diff --git a/fs/Exfat.cpp b/fs/Exfat.cpp
+index 6444178..0b43241 100644
+--- a/fs/Exfat.cpp
++++ b/fs/Exfat.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
++#include <vector>
+ #include <sys/mount.h>
+ 
+ #include <android-base/logging.h>
+diff --git a/fs/Iso9660.cpp b/fs/Iso9660.cpp
+index 44f6f21..d5ce299 100644
+--- a/fs/Iso9660.cpp
++++ b/fs/Iso9660.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include <stdio.h>
+ #include <sys/mount.h>
+ #include <utils/Errors.h>
+diff --git a/fs/Ntfs.cpp b/fs/Ntfs.cpp
+index 6be65bc..66ebcc9 100644
+--- a/fs/Ntfs.cpp
++++ b/fs/Ntfs.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
++#include <vector>
+ #include <sys/mount.h>
+ 
+ #include <android-base/logging.h>
+diff --git a/fs/Vfat.cpp b/fs/Vfat.cpp
+index 3bab02f..7bae530 100644
+--- a/fs/Vfat.cpp
++++ b/fs/Vfat.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
++#include <vector>
+ #include <dirent.h>
+ #include <errno.h>
+ #include <fcntl.h>
+diff --git a/main.cpp b/main.cpp
+index 8956cd5..210478a 100644
+--- a/main.cpp
++++ b/main.cpp
+@@ -16,6 +16,8 @@
+ 
+ #define ATRACE_TAG ATRACE_TAG_PACKAGE_MANAGER
+ 
++#include <memory>
++#include <string>
+ #include "FsCrypt.h"
+ #include "MetadataCrypt.h"
+ #include "NetlinkManager.h"
+diff --git a/model/Disk.cpp b/model/Disk.cpp
+index 84f40b2..6458d4d 100644
+--- a/model/Disk.cpp
++++ b/model/Disk.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <string>
+ #include "Disk.h"
+ #include "FsCrypt.h"
+ #include "PrivateVolume.h"
+diff --git a/model/Disk.h b/model/Disk.h
+index 4c78532..167560d 100644
+--- a/model/Disk.h
++++ b/model/Disk.h
+@@ -17,6 +17,8 @@
+ #ifndef ANDROID_VOLD_DISK_H
+ #define ANDROID_VOLD_DISK_H
+ 
++#include <memory>
++#include <string>
+ #include "StubVolume.h"
+ #include "Utils.h"
+ #include "VolumeBase.h"
+diff --git a/model/DiskPartition.cpp b/model/DiskPartition.cpp
+index 47c27b3..b9d27b5 100644
+--- a/model/DiskPartition.cpp
++++ b/model/DiskPartition.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "DiskPartition.h"
+ #include "PublicVolume.h"
+ #include "PrivateVolume.h"
+diff --git a/model/DiskPartition.h b/model/DiskPartition.h
+index 274d6be..1fc3170 100644
+--- a/model/DiskPartition.h
++++ b/model/DiskPartition.h
+@@ -17,6 +17,7 @@
+ #ifndef ANDROID_VOLD_DISKPARTITION_H
+ #define ANDROID_VOLD_DISKPARTITION_H
+ 
++#include <string>
+ #include "Disk.h"
+ 
+ namespace android {
+diff --git a/model/EmulatedVolume.cpp b/model/EmulatedVolume.cpp
+index 2df35cb..f1169af 100644
+--- a/model/EmulatedVolume.cpp
++++ b/model/EmulatedVolume.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <string>
+ #include "EmulatedVolume.h"
+ 
+ #include "AppFuseUtil.h"
+diff --git a/model/EmulatedVolume.h b/model/EmulatedVolume.h
+index 322dd38..d392548 100644
+--- a/model/EmulatedVolume.h
++++ b/model/EmulatedVolume.h
+@@ -17,6 +17,7 @@
+ #ifndef ANDROID_VOLD_EMULATED_VOLUME_H
+ #define ANDROID_VOLD_EMULATED_VOLUME_H
+ 
++#include <string>
+ #include "VolumeBase.h"
+ 
+ #include <cutils/multiuser.h>
+diff --git a/model/ObbVolume.cpp b/model/ObbVolume.cpp
+index b64c1ba..d515b93 100644
+--- a/model/ObbVolume.cpp
++++ b/model/ObbVolume.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "ObbVolume.h"
+ #include "Loop.h"
+ #include "Utils.h"
+diff --git a/model/ObbVolume.h b/model/ObbVolume.h
+index bfcd3d2..c596cc8 100644
+--- a/model/ObbVolume.h
++++ b/model/ObbVolume.h
+@@ -17,6 +17,7 @@
+ #ifndef ANDROID_VOLD_OBB_VOLUME_H
+ #define ANDROID_VOLD_OBB_VOLUME_H
+ 
++#include <string>
+ #include "VolumeBase.h"
+ 
+ #include <cutils/multiuser.h>
+diff --git a/model/PrivateVolume.cpp b/model/PrivateVolume.cpp
+index 1a51ec7..b2d1cca 100644
+--- a/model/PrivateVolume.cpp
++++ b/model/PrivateVolume.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <string>
+ #include "PrivateVolume.h"
+ #include "EmulatedVolume.h"
+ #include "Utils.h"
+diff --git a/model/PrivateVolume.h b/model/PrivateVolume.h
+index 607c4d1..682a68a 100644
+--- a/model/PrivateVolume.h
++++ b/model/PrivateVolume.h
+@@ -17,6 +17,7 @@
+ #ifndef ANDROID_VOLD_PRIVATE_VOLUME_H
+ #define ANDROID_VOLD_PRIVATE_VOLUME_H
+ 
++#include <string>
+ #include "VolumeBase.h"
+ 
+ #include <cutils/multiuser.h>
+diff --git a/model/PublicVolume.cpp b/model/PublicVolume.cpp
+index bf7aaa6..dd9898e 100644
+--- a/model/PublicVolume.cpp
++++ b/model/PublicVolume.cpp
+@@ -14,6 +14,9 @@
+  * limitations under the License.
+  */
+ 
++#include <algorithm>
++#include <string>
++#include <vector>
+ #include "PublicVolume.h"
+ 
+ #include "AppFuseUtil.h"
+diff --git a/model/PublicVolume.h b/model/PublicVolume.h
+index d28b904..645e659 100644
+--- a/model/PublicVolume.h
++++ b/model/PublicVolume.h
+@@ -17,6 +17,7 @@
+ #ifndef ANDROID_VOLD_PUBLIC_VOLUME_H
+ #define ANDROID_VOLD_PUBLIC_VOLUME_H
+ 
++#include <string>
+ #include "VolumeBase.h"
+ 
+ #include <cutils/multiuser.h>
+diff --git a/model/StubVolume.cpp b/model/StubVolume.cpp
+index d2cd8a8..2962471 100644
+--- a/model/StubVolume.cpp
++++ b/model/StubVolume.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "StubVolume.h"
+ 
+ #include <inttypes.h>
+diff --git a/model/StubVolume.h b/model/StubVolume.h
+index 3697b53..c341bb8 100644
+--- a/model/StubVolume.h
++++ b/model/StubVolume.h
+@@ -17,6 +17,7 @@
+ #ifndef ANDROID_VOLD_STUB_VOLUME_H
+ #define ANDROID_VOLD_STUB_VOLUME_H
+ 
++#include <string>
+ #include "VolumeBase.h"
+ 
+ namespace android {
+diff --git a/model/VolumeBase.cpp b/model/VolumeBase.cpp
+index e20a049..c93307d 100644
+--- a/model/VolumeBase.cpp
++++ b/model/VolumeBase.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <memory>
++#include <string>
+ #include "VolumeBase.h"
+ #include "Utils.h"
+ #include "VolumeManager.h"
+diff --git a/model/VolumeBase.h b/model/VolumeBase.h
+index f29df65..21f023b 100644
+--- a/model/VolumeBase.h
++++ b/model/VolumeBase.h
+@@ -17,6 +17,7 @@
+ #ifndef ANDROID_VOLD_VOLUME_BASE_H
+ #define ANDROID_VOLD_VOLUME_BASE_H
+ 
++#include <memory>
+ #include "Utils.h"
+ #include "android/os/IVoldListener.h"
+ #include "android/os/IVoldMountCallback.h"
+diff --git a/tests/Utils_test.cpp b/tests/Utils_test.cpp
+index 35b40cd..8581133 100644
+--- a/tests/Utils_test.cpp
++++ b/tests/Utils_test.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include <android-base/file.h>
+ #include <gtest/gtest.h>
+ 
+diff --git a/tests/VoldNativeServiceValidation_test.cpp b/tests/VoldNativeServiceValidation_test.cpp
+index 0f87937..4c506ab 100644
+--- a/tests/VoldNativeServiceValidation_test.cpp
++++ b/tests/VoldNativeServiceValidation_test.cpp
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
+ #include "../VoldNativeServiceValidation.h"
+ 
+ #include <gtest/gtest.h>
+diff --git a/vdc.cpp b/vdc.cpp
+index 400bc5d..4edeadd 100644
+--- a/vdc.cpp
++++ b/vdc.cpp
+@@ -14,6 +14,8 @@
+  * limitations under the License.
+  */
+ 
++#include <string>
++#include <vector>
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <poll.h>
+diff --git a/vold_prepare_subdirs.cpp b/vold_prepare_subdirs.cpp
+index bd7ec4f..81eb052 100644
+--- a/vold_prepare_subdirs.cpp
++++ b/vold_prepare_subdirs.cpp
+@@ -19,6 +19,7 @@
+  * apply the context if it's absent. Also fixes mode, uid, gid.
+  */
+ 
++#include <memory>
+ #include <iostream>
+ #include <string>
+ #include <vector>

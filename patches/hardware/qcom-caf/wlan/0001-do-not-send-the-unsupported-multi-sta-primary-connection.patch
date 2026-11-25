@@ -1,0 +1,57 @@
+From: uzbforce <oktamovazizbek2010@gmail.com>
+Subject: [hardware/qcom-caf/wlan] do not send the unsupported multi-sta primary connection hint
+
+diff --git a/qcwcn/wifi_hal/wificonfig.cpp b/qcwcn/wifi_hal/wificonfig.cpp
+index fbd96ac..0be8f58 100644
+--- a/qcwcn/wifi_hal/wificonfig.cpp
++++ b/qcwcn/wifi_hal/wificonfig.cpp
+@@ -1599,6 +1599,16 @@ wifi_error wifi_multi_sta_set_primary_connection(wifi_handle handle,
+         ALOGE("%s: Error wifi_handle NULL", __FUNCTION__);
+         return WIFI_ERROR_UNKNOWN;
+     }
++    /*
++     * sm6225 / WCN3950 firmware rejects CONCURRENT_STA_PRIMARY with -ENODEV.
++     * The netlink failure is treated as fatal and the HAL tears itself down in
++     * the middle of createStaIface, so Wi-Fi never comes up. This hint only
++     * matters when two STA ifaces are active, and this chip has no concurrent
++     * STA support (dbs=0, mimo=0), so report success without sending it.
++     */
++    ALOGD("%s: no concurrent STA support on this platform, skipping", __FUNCTION__);
++    return WIFI_SUCCESS;
++
+     struct nlattr *nlData;
+     interface_info *ifaceInfo = getIfaceInfo(iface);
+ 
+diff --git a/qcwcn/wpa_supplicant_8_lib/driver_cmd_nl80211.c b/qcwcn/wpa_supplicant_8_lib/driver_cmd_nl80211.c
+index 6988a9c..c2798f4 100644
+--- a/qcwcn/wpa_supplicant_8_lib/driver_cmd_nl80211.c
++++ b/qcwcn/wpa_supplicant_8_lib/driver_cmd_nl80211.c
+@@ -74,6 +74,10 @@
+ #include "driver_cmd_nl80211_mlo.h"
+ #include <inttypes.h>
+ 
++/* Single definition of the globals declared in driver_cmd_nl80211_common.h. */
++struct wpa_driver_nl80211_data *drv;
++struct i802_bss *bss;
++
+ #define WPA_PS_ENABLED		0
+ #define WPA_PS_DISABLED		1
+ #define UNUSED(x)	(void)(x)
+diff --git a/qcwcn/wpa_supplicant_8_lib/driver_cmd_nl80211_common.h b/qcwcn/wpa_supplicant_8_lib/driver_cmd_nl80211_common.h
+index 0e53212..64e0555 100644
+--- a/qcwcn/wpa_supplicant_8_lib/driver_cmd_nl80211_common.h
++++ b/qcwcn/wpa_supplicant_8_lib/driver_cmd_nl80211_common.h
+@@ -54,8 +54,11 @@
+ #define MAX_NUM_MLO_LINKS      15
+ #define NL80211_ATTR_MAX_INTERNAL 256
+ 
+-struct wpa_driver_nl80211_data *drv;
+-struct i802_bss *bss;
++/* Declarations only: these used to be definitions, which produced one
++ * copy per translation unit and broke the link once -fno-common became
++ * the default. The definitions live in driver_cmd_nl80211.c. */
++extern struct wpa_driver_nl80211_data *drv;
++extern struct i802_bss *bss;
+ struct nl_msg *prepare_nlmsg(struct wpa_driver_nl80211_data *drv,
+ 		             char *ifname, int cmdid, int subcmd, int flag);
+ struct nl_msg *prepare_vendor_nlmsg(struct wpa_driver_nl80211_data *drv,

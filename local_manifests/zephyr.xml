@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copy this file to .repo/local_manifests/zephyr.xml before `repo sync`.
+
+    RisingOS Revived 9 (branch seventeen) is LineageOS 24.0 based, but it has no
+    sm6225 platform tree: its bengal devices run the legacy-UM policy with
+    QCOM_HARDWARE_VARIANT := sm8250. Zephyr's blobs are 5.15-era (composer@3.0,
+    audio@7.1), so the sm8250 set is the wrong interface level.
+
+    The projects below are the Redmi Note 12 4G (also SM6225, also Android 16)
+    platform set, mirrored into the uzbforce org. Each mirror is named from its
+    path (android_<path, / as _>), which is the LineageOS project name every
+    qcom device uses - and it fixes the one upstream that does not follow it,
+    the hardware_qcom-caf_common fork, which is android_hardware_qcom-caf_common
+    here.
+
+    The revisions are pinned to the commits the LineageOS 24.0 build used.
+-->
+<manifest>
+    <!-- Replace RisingOS' common qcom tree: this fork knows about
+         TARGET_BOARD_SUFFIX := _515 and creates the sm6225 pickup files. -->
+    <remove-project name="LineageOS/android_hardware_qcom-caf_common" />
+    <remove-project name="LineageOS/android_hardware_qcom_display" />
+    <remove-project name="LineageOS/android_vendor_qcom_opensource_agm" />
+    <remove-project name="LineageOS/android_vendor_qcom_opensource_arpal-lx" />
+    <remove-project name="LineageOS/android_vendor_qcom_opensource_dataipa" />
+    <remove-project name="LineageOS/android_vendor_qcom_opensource_data-ipa-cfg-mgr" />
+
+    <!-- Device and blobs. -->
+    <project path="device/xiaomi/zephyr"
+             name="uzbforce/android_device_xiaomi_zephyr"
+             revision="lineage-24.0" remote="github" />
+    <project path="vendor/xiaomi/zephyr"
+             name="uzbforce/android_vendor_xiaomi_zephyr"
+             revision="lineage-24.0" remote="github" />
+
+    <!-- Prebuilt kernel tree is not a repo project; see the device tree README.
+         It is produced by tools/gen-prebuilt-kernel.py from the stock firmware,
+         and this checkout carries the exact tree the build uses. -->
+
+    <project path="hardware/qcom-caf/common"
+             name="uzbforce/android_hardware_qcom-caf_common"
+             revision="5984fede9b8463a44db1f5a58500cf128eb612bd"
+             remote="github">
+        <linkfile src="os_pickup_aosp.mk" dest="hardware/qcom/Android.mk" />
+        <linkfile src="os_pickup_sepolicy_vndr.mk" dest="device/qcom/sepolicy_vndr/SEPolicy.mk" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm6225/Android.bp" />
+        <linkfile src="os_pickup.mk" dest="hardware/qcom-caf/sm6225/Android.mk" />
+        <linkfile src="os_pickup_audio-ar.mk" dest="hardware/qcom-caf/sm6225/audio/Android.mk" />
+
+        <!-- Lineage's own entry for this project puts a soong_namespace stub
+             into every other platform dir. This entry replaces that one, so
+             those links have to be repeated here: without them soong parses
+             all of hardware/qcom-caf/* in the default namespace and the build
+             stops with "module ... already defined" for modules every
+             platform tree defines (audio_extn, libstagefrighthw,
+             libqcompostprocbundle, ...). -->
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/msm8953/Android.bp" />
+        <linkfile src="os_pickup.bp" dest="hardware/qcom-caf/msm8996/Android.bp" />
+        <linkfile src="os_pickup.mk" dest="hardware/qcom-caf/msm8996/Android.mk" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sdm660/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8150/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8250/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8350/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8450/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8450-6.6/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8550/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8650/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8750/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8850/Android.bp" />
+    </project>
+
+    <!-- No hardware/qcom-caf/sm6225/display: its SDE/DPU HALs need the techpack
+         display headers that the open source kernel tree does not ship, so the
+         graphics stack stays the stock vendor blobs. -->
+    <project path="hardware/qcom-caf/sm6225/audio/agm"
+             name="uzbforce/android_hardware_qcom-caf_sm6225_audio_agm"
+             revision="e3129f4900c9b7cc16f045d883b510e9d0bb449a" remote="github" />
+    <project path="hardware/qcom-caf/sm6225/audio/pal"
+             name="uzbforce/android_hardware_qcom-caf_sm6225_audio_pal"
+             revision="e8df3187959b0b08cfa964a78c36ab2d3fb3c1a2" remote="github" />
+    <project path="hardware/qcom-caf/sm6225/audio/primary-hal"
+             name="uzbforce/android_hardware_qcom-caf_sm6225_audio_primary-hal"
+             revision="3a9ea814fefa40ce815066fe231a4c6ab81859a1" remote="github" />
+    <project path="hardware/qcom-caf/sm6225/data-ipa-cfg-mgr"
+             name="uzbforce/android_hardware_qcom-caf_sm6225_data-ipa-cfg-mgr"
+             revision="3e33492e5aa7581d815843573005e13fc2cec25a" remote="github" />
+    <project path="hardware/qcom-caf/sm6225/dataipa"
+             name="uzbforce/android_hardware_qcom-caf_sm6225_dataipa"
+             revision="cf8702206e354dc12485fb21d2dd0ed69cc28936" remote="github" />
+
+    <!-- Nested inside Lineage's device/qcom/sepolicy_vndr checkout. -->
+    <project path="device/qcom/sepolicy_vndr/sm6225"
+             name="uzbforce/android_device_qcom_sepolicy_vndr_sm6225"
+             revision="913a662228f34867488f37ba15f7a91e59bd4f96" remote="github" />
+</manifest>

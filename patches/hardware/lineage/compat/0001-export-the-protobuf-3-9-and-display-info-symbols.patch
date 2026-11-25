@@ -1,0 +1,274 @@
+From: uzbforce <oktamovazizbek2010@gmail.com>
+Subject: [hardware/lineage/compat] export the protobuf 3.9 and display-info symbols
+
+diff --git a/Android.bp b/Android.bp
+index 3c477f2..7490e5b 100644
+--- a/Android.bp
++++ b/Android.bp
+@@ -145,6 +145,10 @@ cc_library {
+         "libbase/logging.cpp",
+         "libbase/strings.cpp",
+     ],
++    // 32-bit vendor consumers (libavservices_minijail, libreference-ril,
++    // tms-utils, the 32-bit codec2 library) import the same pre-string_view
++    // ABI, so the shim has to exist in vendor/lib as well.
++    compile_multilib: "both",
+     vendor: true,
+ }
+ 
+@@ -500,6 +504,7 @@ cc_library_shared {
+         "libutils",
+     ],
+     srcs: [
++        "libui/DisplayInfo.cpp",
+         "libui/Fence.cpp",
+         "libui/GraphicBuffer.cpp",
+         "libui/GraphicBufferMapper.cpp",
+@@ -508,6 +513,33 @@ cc_library_shared {
+     vendor_available: true,
+ }
+ 
++// Qualcomm's qccsyshal 1.2 blobs were built against protobuf 3.9, where
++// Message::CopyWithSourceCheck(Message&, Message const&) was an exported
++// symbol. Protobuf 4.25 no longer has it, so the vendored HAL aborts at load
++// time with "cannot locate symbol ... CopyWithSourceCheck". This shim exports
++// the old mangled names and forwards to the virtual CopyFrom().
++cc_library_shared {
++    name: "libprotobuf-qccshim",
++    system_ext_specific: true,
++    srcs: [
++        "libprotobuf/AssignDescriptors.cpp",
++        "libprotobuf/CopyWithSourceCheck.cpp",
++        "libprotobuf/ParseFromString.cpp",
++    ],
++    include_dirs: [
++        "external/abseil-cpp",
++        "external/protobuf/src",
++    ],
++    shared_libs: [
++        "libc++",
++        "libprotobuf-cpp-full",
++    ],
++    cflags: [
++        "-Wall",
++        "-Werror",
++    ],
++}
++
+ cc_prebuilt_library_shared {
+     name: "libui-v32",
+     vendor: true,
+diff --git a/libprotobuf/AssignDescriptors.cpp b/libprotobuf/AssignDescriptors.cpp
+new file mode 100644
+index 0000000..debe601
+--- /dev/null
++++ b/libprotobuf/AssignDescriptors.cpp
+@@ -0,0 +1,48 @@
++/*
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/*
++ * Qualcomm's qccsyshal 1.2 implementation was built against protobuf 3.9,
++ * where google::protobuf::internal::AssignDescriptors(const DescriptorTable*,
++ * bool) was an exported symbol. Protobuf 4.25 no longer exports that entry
++ * point, so the prebuilt HAL fails to load:
++ *
++ *   CANNOT LINK EXECUTABLE "/system/system_ext/bin/qccsyshal@1.2-service":
++ *   cannot locate symbol
++ *   "_ZN6google8protobuf8internal17AssignDescriptorsEPKNS1_15DescriptorTableEb"
++ *
++ * In 3.9 the function only parked the table pointer for lazy reflection; the
++ * messages this HAL serializes do not use reflection. Provide the old mangled
++ * names as no-ops so the service can link.
++ *
++ * The generated code also calls the older entry point that takes a function
++ * pointer, a once_flag and the Metadata reference:
++ *
++ *   AssignDescriptors(const DescriptorTable* (*get_table)(), std::once_flag*,
++ *                     const Metadata&)
++ *
++ * so both overloads have to be present.
++ */
++
++#include <mutex>
++
++namespace google {
++namespace protobuf {
++
++// 3.9 declares Metadata in google::protobuf, not in internal; the mangled
++// name the prebuilt HAL imports is ...RKNS0_8MetadataE.
++struct Metadata;
++
++namespace internal {
++
++struct DescriptorTable;
++
++__attribute__((visibility("default"))) void AssignDescriptors(const DescriptorTable*, bool) {}
++
++__attribute__((visibility("default"))) void AssignDescriptors(
++        const DescriptorTable* (*)(), std::once_flag*, const Metadata&) {}
++
++}  // namespace internal
++}  // namespace protobuf
++}  // namespace google
+diff --git a/libprotobuf/CopyWithSourceCheck.cpp b/libprotobuf/CopyWithSourceCheck.cpp
+new file mode 100644
+index 0000000..48a3591
+--- /dev/null
++++ b/libprotobuf/CopyWithSourceCheck.cpp
+@@ -0,0 +1,27 @@
++/*
++ * Copyright (C) 2026 The LineageOS Project
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/*
++ * Qualcomm's qccsyshal 1.2 implementation was built against protobuf 3.9, where
++ * google::protobuf::Message::CopyWithSourceCheck(Message&, const Message&) is
++ * an out-of-line exported symbol. Protobuf 4.25 removed it, so the prebuilt HAL
++ * fails to link at runtime:
++ *
++ *   CANNOT LINK EXECUTABLE "/system/system_ext/bin/qccsyshal@1.2-service":
++ *   cannot locate symbol "_ZN6google8protobuf7Message19CopyWithSourceCheckERS1_RKS1_"
++ *
++ * Define the old mangled name here and forward to the virtual CopyFrom(), which
++ * is the operation the 3.9 implementation performed after its debug-only type
++ * check.
++ */
++
++#include <google/protobuf/message.h>
++
++extern "C" __attribute__((visibility("default"))) void
++_ZN6google8protobuf7Message19CopyWithSourceCheckERS1_RKS1_(google::protobuf::Message& to,
++                                                           const google::protobuf::Message& from) {
++    to.CopyFrom(from);
++}
+diff --git a/libprotobuf/ParseFromString.cpp b/libprotobuf/ParseFromString.cpp
+new file mode 100644
+index 0000000..d09d3c3
+--- /dev/null
++++ b/libprotobuf/ParseFromString.cpp
+@@ -0,0 +1,25 @@
++/*
++ * Copyright (C) 2026 The LineageOS Project
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/*
++ * Second protobuf 3.9 symbol the qccsyshal 1.2 blobs need. Protobuf 4.25
++ * takes the payload as absl::string_view and no longer emits an out-of-line
++ * std::string overload, so the prebuilt HAL aborts at load time with:
++ *
++ *   cannot locate symbol
++ *   "_ZN6google8protobuf11MessageLite15ParseFromStringERKNSt3__112basic_string..._"
++ *
++ * The 3.9 implementation is a two-line forward to the virtual ParseFromArray(),
++ * so define the old mangled name and forward to the same place.
++ */
++
++#include <google/protobuf/message_lite.h>
++
++extern "C" __attribute__((visibility("default"))) bool
++_ZN6google8protobuf11MessageLite15ParseFromStringERKNSt3__112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE(
++        google::protobuf::MessageLite* message, const std::string& data) {
++    return message->ParseFromArray(data.data(), static_cast<int>(data.size()));
++}
+diff --git a/libui/DisplayInfo.cpp b/libui/DisplayInfo.cpp
+new file mode 100644
+index 0000000..382b128
+--- /dev/null
++++ b/libui/DisplayInfo.cpp
+@@ -0,0 +1,90 @@
++/*
++ * Copyright (C) 2026 The LineageOS Project
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++// Android 17 dropped the LightFlattenable entry points from
++// ui::StaticDisplayInfo and ui::DynamicDisplayInfo (both are only serialised
++// through AIDL now). Xiaomi's prebuilt libgui_vendor.so still imports them and
++// is linked with -z now, so the display-feature HAL cannot even be dlopen()ed
++// without them:
++//
++//   CANNOT LINK EXECUTABLE "/vendor/bin/displayfeature": cannot locate symbol
++//   "_ZNK7android2ui17StaticDisplayInfo16getFlattenedSizeEv" referenced by
++//   "/vendor/lib64/libgui_vendor.so"
++//
++// vendor.qti.hardware.display.composer-service blocks on
++// vendor.xiaomi.hardware.displayfeature@1.0::IDisplayFeature/default, so that
++// failed load stalls the composer HAL, SurfaceFlinger never latches a frame
++// and the device stays on the boot logo.
++//
++// The legacy binder format has no reader left in Android 17, so these are pure
++// ABI shims: every entry point reports a fixed, self-consistent size and never
++// dereferences the caller's object. Re-check them after regenerating
++// vendor/xiaomi/zephyr from a new stock dump.
++//
++// ui::StaticDisplayInfo: connectionType, density, secure,
++// optional<DeviceProductInfo>, installOrientation.
++// ui::DynamicDisplayInfo: supportedDisplayModes, activeDisplayModeId,
++// renderFrameRate, supportedColorModes, activeColorMode, hdrCapabilities,
++// autoLowLatencyModeSupported, gameContentTypeSupported,
++// preferredBootDisplayMode.
++
++#include <errno.h>
++#include <stddef.h>
++#include <stdint.h>
++#include <string.h>
++
++namespace {
++
++constexpr size_t kStaticDisplayInfoSize = 4 + 4 + 1 + 1 + 4;
++constexpr size_t kDynamicDisplayInfoSize = 4 + 4 + 4 + 4 + 4 + 1 + 1 + 4;
++
++}  // namespace
++
++extern "C" {
++
++size_t _ZNK7android2ui17StaticDisplayInfo16getFlattenedSizeEv(const void* /*self*/) {
++    return kStaticDisplayInfoSize;
++}
++
++int32_t _ZNK7android2ui17StaticDisplayInfo7flattenEPvm(const void* /*self*/, void* buffer,
++                                                       size_t size) {
++    if (buffer == nullptr || size < kStaticDisplayInfoSize) {
++        return -ENOMEM;
++    }
++    memset(buffer, 0, kStaticDisplayInfoSize);
++    return 0;
++}
++
++int32_t _ZN7android2ui17StaticDisplayInfo9unflattenEPKvm(void* /*self*/, const void* buffer,
++                                                         size_t size) {
++    if (buffer == nullptr || size < kStaticDisplayInfoSize) {
++        return -EINVAL;
++    }
++    return 0;
++}
++
++size_t _ZNK7android2ui18DynamicDisplayInfo16getFlattenedSizeEv(const void* /*self*/) {
++    return kDynamicDisplayInfoSize;
++}
++
++int32_t _ZNK7android2ui18DynamicDisplayInfo7flattenEPvm(const void* /*self*/, void* buffer,
++                                                        size_t size) {
++    if (buffer == nullptr || size < kDynamicDisplayInfoSize) {
++        return -ENOMEM;
++    }
++    memset(buffer, 0, kDynamicDisplayInfoSize);
++    return 0;
++}
++
++int32_t _ZN7android2ui18DynamicDisplayInfo9unflattenEPKvm(void* /*self*/, const void* buffer,
++                                                          size_t size) {
++    if (buffer == nullptr || size < kDynamicDisplayInfoSize) {
++        return -EINVAL;
++    }
++    return 0;
++}
++
++}  // extern "C"

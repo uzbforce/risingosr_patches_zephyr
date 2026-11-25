@@ -1,0 +1,16 @@
+From: uzbforce <oktamovazizbek2010@gmail.com>
+Subject: [vendor/qcom/opensource/power] run the power HAL in the input group and declare its AIDL interface
+
+diff --git a/android.hardware.power-service-qti.rc b/android.hardware.power-service-qti.rc
+index 01f9e70..861d6d5 100644
+--- a/android.hardware.power-service-qti.rc
++++ b/android.hardware.power-service-qti.rc
+@@ -2,6 +2,8 @@ service vendor.power /vendor/bin/hw/android.hardware.power-service-qti
+     class hal
+     user system
+     group system
++    group input
++    interface aidl android.hardware.power.IPower/default
+ 
+ on post-fs
+     chmod 0664 /sys/devices/virtual/graphics/fb0/idle_time

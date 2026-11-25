@@ -1,0 +1,48 @@
+From: uzbforce <oktamovazizbek2010@gmail.com>
+Subject: [system/libbase] keep the pre-string-view libbase symbols the vendor hals import
+
+diff --git a/file.cpp b/file.cpp
+index c03d7e1..cf95f04 100644
+--- a/file.cpp
++++ b/file.cpp
+@@ -277,6 +277,18 @@ bool WriteStringToFd(std::string_view content, borrowed_fd fd) {
+   return true;
+ }
+ 
++// Prebuilt vendor HALs in this device tree (health, sensors) were built against
++// the pre-string_view libbase and import this exact mangled symbol. Keep the
++// legacy ABI around so those binaries can still resolve it from
++// /vendor/lib64/libbase.so. Declared with an asm label instead of an overload
++// so string literals do not become ambiguous at call sites.
++bool WriteStringToFdLegacy(const std::string& content, borrowed_fd fd)
++    asm("_ZN7android4base15WriteStringToFdERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEENS0_11borrowed_fdE");
++
++bool WriteStringToFdLegacy(const std::string& content, borrowed_fd fd) {
++  return WriteStringToFd(std::string_view(content), fd);
++}
++
+ static bool CleanUpAfterFailedWrite(const std::string& path) {
+   // Something went wrong. Let's not leave a corrupt file lying around.
+   int saved_errno = errno;
+diff --git a/strings.cpp b/strings.cpp
+index a776d22..86448f5 100644
+--- a/strings.cpp
++++ b/strings.cpp
+@@ -76,6 +76,17 @@ template std::string Trim(const std::string&&);
+ template std::string Trim(std::string_view&);
+ template std::string Trim(std::string_view&&);
+ 
++// Prebuilt vendor HALs in this device tree (health) still import the pre-template
++// Trim overload by its old mangled name. Keep the legacy ABI available from
++// /vendor/lib64/libbase.so; declared with an asm label rather than an overload
++// so ordinary calls keep resolving to the template.
++std::string TrimLegacy(const std::string& s)
++    asm("_ZN7android4base4TrimERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE");
++
++std::string TrimLegacy(const std::string& s) {
++  return Trim(s);
++}
++
+ // These cases were measured either to be used during build by more than one binary, or during
+ // runtime as a significant portion of total calls.
+ // Instantiate them to aid compile time and binary size.

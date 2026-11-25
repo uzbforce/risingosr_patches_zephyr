@@ -1,0 +1,45 @@
+From: uzbforce <oktamovazizbek2010@gmail.com>
+Subject: [lineage-sdk] fall back to a local global actions list when the service is absent
+
+diff --git a/sdk/src/java/lineageos/app/LineageGlobalActions.java b/sdk/src/java/lineageos/app/LineageGlobalActions.java
+index bd8089e..3bd4331 100644
+--- a/sdk/src/java/lineageos/app/LineageGlobalActions.java
++++ b/sdk/src/java/lineageos/app/LineageGlobalActions.java
+@@ -11,6 +11,7 @@ import android.os.RemoteException;
+ import android.os.ServiceManager;
+ import android.util.Log;
+ 
++import java.util.ArrayList;
+ import java.util.List;
+ 
+ public class LineageGlobalActions {
+@@ -94,7 +95,8 @@ public class LineageGlobalActions {
+         try {
+             return getService().getLocalUserConfig();
+         } catch (RemoteException e) {
+-            throw e.rethrowFromSystemServer();
++            Log.e(TAG, "Unable to get local user config", e);
++            return new ArrayList<>();
+         }
+     }
+ 
+@@ -107,7 +109,8 @@ public class LineageGlobalActions {
+         try {
+             return getService().getUserActionsArray();
+         } catch (RemoteException e) {
+-            throw e.rethrowFromSystemServer();
++            Log.e(TAG, "Unable to get user actions", e);
++            return new String[0];
+         }
+     }
+ 
+@@ -121,7 +124,8 @@ public class LineageGlobalActions {
+         try {
+             return getService().userConfigContains(preference);
+         } catch (RemoteException e) {
+-            throw e.rethrowFromSystemServer();
++            Log.e(TAG, "Unable to check user config", e);
++            return false;
+         }
+     }
+ }
